@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MainWindow" Height="500" Width="700">
     <Grid>
-        <Canvas Height="399" HorizontalAlignment="Left" Margin="0,38,0,0" Name="canvas1" VerticalAlignment="Top" Width="678" Background="#FF414185" MouseMove="canvas1_MouseMove" />
+        <Canvas Height="399" HorizontalAlignment="Left" Margin="0,38,0,0" Name="canvas1" VerticalAlignment="Top" Width="678" Background="#FF414185" MouseMove="canvas1_MouseMove" MouseDown="canvas1_MouseDown" MouseUp="canvas1_MouseUp" />
         <TextBox Height="32" HorizontalAlignment="Right" Margin="0,0,422,0" Name="textBox1" VerticalAlignment="Top" Width="123" FontSize="24" />
         <TextBlock Height="32" HorizontalAlignment="Left" Name="textBlock1" Text="チャンネル" VerticalAlignment="Top" Width="127" FontSize="24" TextAlignment="Center" />
         <Button Height="32" HorizontalAlignment="Left" Margin="262,0,0,0" Name="button1" VerticalAlignment="Top" Width="148" Content="チャンネル登録" IsEnabled="False" Click="button1_Click" />

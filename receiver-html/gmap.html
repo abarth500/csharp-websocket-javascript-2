@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Google Maps JavaScript API v3 Example: Map Simple</title>
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta charset="UTF-8">
+    <style type="text/css">
+      html, body, #map_canvas {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+      }
+    </style>
+    <script type="text/javascript"
+        src="https://maps.googleapis.com/maps/api/js?sensor=false"></script>
+    <script type="text/javascript">
+//[要変更]ここにWebsocket プロキシサーバのURLをセットします。
+var serverURL = "";
+//[要変更]ここにチャンネル文字列（半角英数字・ブラウザ側と同じ文字列）をセットします
+var channel = "";
+
+
+var map;
+var scroll = false;
+var X = -1;
+var Y = -1;
+function initialize() {
+	if(channel == "" || serverURL == ""){
+		document.getElementById('messageBar').innerHTML = '[ERROR] チャンネルもしくはURLが空です。';
+		return;
+	}
+	var myOptions = {
+		zoom: 17,
+		center: new google.maps.LatLng(34.725102, 137.717439),
+		mapTypeId: google.maps.MapTypeId.HYBRID
+	};
+	map = new google.maps.Map(document.getElementById('map_canvas'),myOptions);
+	var webSocket = new WebSocket(serverURL);
+	webSocket.onopen = function(event){
+		document.getElementById('messageBar').innerHTML = '接続完了';
+		webSocket.send(channel + ':');
+	};
+
+        webSocket.onmessage = function(event){
+		var msg = event.data;
+		if(msg == channel + ";"){
+			document.getElementById('messageBar').innerHTML = 'ハンドシェイク完了';
+		}else if(msg.indexOf(channel + ":") == 0){
+			//メッセージはココで受信
+			//チャンネル削除
+			msg = msg.substring(msg.indexOf(":")+1);
+			//カンマで分けて配列へ
+			var fields = msg.split(",");
+			//配列最初の要素はコマンド名なので取り出します。
+			var cmd = fields.shift();
+			//コマンドに応じて処理を切り替えます。
+			switch(cmd){
+				case "mouse":
+					if(scroll){
+						//注：サーバから来たデータは文字列として扱われているため、
+						//数値を送った場合使用時はparseInt等で数値化する。
+						var x = parseInt(fields[0]);
+						var y = parseInt(fields[1]);
+						if(X > -1){
+							//地図をスクロール
+							map.panBy(X-x,Y-y);
+						}
+						X = x;
+						Y = y;
+					}
+					break;
+				case "down":
+					//スクロール開始
+					scroll = true;
+					break;
+				case "up":
+					//スクロール終了
+					scroll = false;
+					//一つ前の座標を記憶しておく変数を初期化
+					X = -1;
+					Y = -1;
+					break;
+			}
+		}
+	}
+}
+google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+  </head>
+  <body>
+    <div id="map_canvas"></div>
+    <div style="position:absolute;top:0px;left:0px;width:100%;height:24px;background:black;color:white;padding:3px;" id="messageBar">&nbsp;</div>
+  </body>
+</html>

@@ -49,12 +49,12 @@ namespace sender_csharp
         }
 
         //WebSocketで文字列を送信するメソッド
-        private void sendMessage(string msg)
+        private void sendMessage(string cmd, string msg)
         {
             if (ready)
             {
                 //channelを先頭に付けて送信
-                websocket.Send(channel + ":" + msg);
+                websocket.Send(channel + ":" + cmd + "," + msg);
             }
         }
 
@@ -64,7 +64,7 @@ namespace sender_csharp
             double x = e.GetPosition(canvas1).X; //canvas1の左上をゼロとした座標
             double y = e.GetPosition(canvas1).Y;
             // カンマで区切ったマウスのxy座標を送信
-            sendMessage(x + "," + y);
+            sendMessage("mouse",x + "," + y);
         }
      
         private void websocket_Opened(object sender, EventArgs e)
@@ -151,6 +151,20 @@ namespace sender_csharp
             else {
                 MessageBox.Show("チャンネルは半角英数字のみ！");
             }
+        }
+
+        private void canvas1_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            double x = e.GetPosition(canvas1).X;
+            double y = e.GetPosition(canvas1).Y;
+            sendMessage("down", x + "," + y);
+        }
+
+        private void canvas1_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            double x = e.GetPosition(canvas1).X;
+            double y = e.GetPosition(canvas1).Y;
+            sendMessage("up", x + "," + y);
         }
     }
 }
